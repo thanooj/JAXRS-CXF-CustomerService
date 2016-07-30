@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import com.jaxrs.cxf.rest.bo.Customer;
 import com.jaxrs.cxf.rest.bo.Greeting;
 import com.jaxrs.cxf.rest.bo.NewCustomer;
-import com.jaxrs.cxf.rest.util.TransactionBo;
+import com.jaxrs.cxf.rest.dao.CustomerDAOImpl;
 
 @Component("customerService")
 public class CustomerServiceImpl implements CustomerService {
@@ -25,7 +25,7 @@ public class CustomerServiceImpl implements CustomerService {
 	private final AtomicLong counter = new AtomicLong();
 
 	@Autowired
-	private TransactionBo transactionBo;
+	private CustomerDAOImpl customerDAO;
 
 	@Override
 	public Greeting greeting(String name) {
@@ -37,7 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public Response getCustomerByID(Integer id) {
 		Response response = null;
 		logger.info("CustomerService.getCustomerByID() : " + id);
-		Customer customer = transactionBo.getCustomerByID(id);
+		Customer customer = customerDAO.getCustomerByID(id);
 		if (customer != null) {
 			response = Response.status(Status.OK).entity(customer).build();
 		} else {
@@ -50,7 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
 	public Response getCustomers() {
 		Response response = null;
 		logger.info("CustomerService.getCustomers()");
-		List<Customer> customers = transactionBo.getCustomers();
+		List<Customer> customers = customerDAO.getCustomers();
 		if (customers != null && !customers.isEmpty()) {
 			response = Response.status(Status.OK).entity(customers).build();
 		} else {
@@ -65,18 +65,20 @@ public class CustomerServiceImpl implements CustomerService {
 		String msg = "BAD REQUEST!";
 		if (newCustomer != null && !newCustomer.isEmpty()) {
 			logger.info("newCustomer != null && newCustomer.isEmpty() == false  :: "
-					+ (newCustomer.size()));
-			logger.info("newCustomer != null && newCustomer.isEmpty() == false  :: "
 					+ (newCustomer != null && newCustomer.isEmpty() == false));
-			msg = transactionBo.createCustomer(newCustomer);
-			if(msg.contains("successfully created.")){
-			response = Response.status(Status.CREATED).entity(msg).build();
+			int[] createCustomer = customerDAO.createCustomer(newCustomer);
+			if (createCustomer.length == newCustomer.size()) {
+				msg = "All new customers are successfully created.";
+				response = Response.status(Status.CREATED).entity(msg).build();
+			} else if (createCustomer.length < newCustomer.size()) {
+				msg = "NOT all new customers are successfully created.";
+				response = Response.status(Status.CREATED).entity(msg).build();
 			} else {
 				response = Response.status(Status.BAD_REQUEST).entity(msg).build();
 			}
 		} else {
 			logger.info("else");
-			response = Response.status(Status.NO_CONTENT).entity(msg).build();
+			response = Response.status(Status.BAD_REQUEST).entity(msg).build();
 		}
 		return response;
 	}
@@ -84,13 +86,19 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Response updateCustomer(Customer customer) {
 		Response response = null;
+		String msg = "BAD REQUEST";
 		if (customer != null && customer.getId() != null) {
 			logger.info("newCustomer != null");
-			transactionBo.updateCustomer(customer);
-			response = Response.status(Status.CREATED).entity(customer).build();
+			int updateCustomer = customerDAO.updateCustomer(customer);
+			if (updateCustomer > 0) {
+				msg = "A customer has been updated/created successfully.";
+				response = Response.status(Status.CREATED).entity(msg).build();
+			} else {
+				response = Response.status(Status.BAD_REQUEST).entity(msg).build();
+			}
 		} else {
 			logger.info("else");
-			response = Response.status(Status.NO_CONTENT).entity(null).build();
+			response = Response.status(Status.BAD_REQUEST).entity(msg).build();
 		}
 		return response;
 	}
@@ -98,9 +106,11 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Response deleteCustomerByID(Integer id) {
 		Response response = null;
+		String msg = "BAD REQUEST";
 		logger.info("CustomerService.deleteCustomerByID() : " + id);
-		String msg = transactionBo.deleteCustomerByID(id);
-		if (msg.contains("successfully")) {
+		int deleteCustomerByID = customerDAO.deleteCustomerByID(id);
+		if (deleteCustomerByID > 0) {
+			msg = "A customer has been deleted successfully.";
 			response = Response.status(Status.OK).entity(msg).build();
 		} else {
 			response = Response.status(Status.NOT_FOUND).entity(msg).build();

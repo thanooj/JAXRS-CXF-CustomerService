@@ -1,5 +1,8 @@
 package com.jaxrs.cxf.rest.bo;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class NewCustomer {
 
 	private String name;

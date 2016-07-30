@@ -2,7 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:p="http://www.springframework.org/schema/p" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
@@ -22,18 +24,17 @@
 		</jaxrs:providers>
 	</jaxrs:server>
 
+	<bean id="customerDao" class="com.jaxrs.cxf.rest.dao.CustomerDAOImpl" />
 
-	<!-- <bean id="customerDao" class="com.example.JdbcCorporateEventDao">
-		<property name="dataSource" ref="dataSource" />
-	</bean>
-
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
 		destroy-method="close">
-		<property name="driverClassName" value="${jdbc.driverClassName}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
 		<property name="password" value="${jdbc.password}" />
 	</bean>
-
-	<context:property-placeholder location="jdbc.properties" /> -->
+	<!-- <jdbc:initialize-database data-source="dataSource">
+		<jdbc:script location="classpath:db-schema.sql" />
+	</jdbc:initialize-database> -->
+	<context:property-placeholder location="classpath:jdbc.properties" />
 </beans>
