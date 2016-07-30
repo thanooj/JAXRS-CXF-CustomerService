@@ -62,14 +62,21 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public Response createCustomer(final List<NewCustomer> newCustomer) {
 		Response response = null;
-		if (newCustomer != null && newCustomer.isEmpty() == false) {
+		String msg = "BAD REQUEST!";
+		if (newCustomer != null && !newCustomer.isEmpty()) {
+			logger.info("newCustomer != null && newCustomer.isEmpty() == false  :: "
+					+ (newCustomer.size()));
 			logger.info("newCustomer != null && newCustomer.isEmpty() == false  :: "
 					+ (newCustomer != null && newCustomer.isEmpty() == false));
-			transactionBo.createCustomer(newCustomer);
-			response = Response.status(Status.CREATED).entity(newCustomer).build();
+			msg = transactionBo.createCustomer(newCustomer);
+			if(msg.contains("successfully created.")){
+			response = Response.status(Status.CREATED).entity(msg).build();
+			} else {
+				response = Response.status(Status.BAD_REQUEST).entity(msg).build();
+			}
 		} else {
 			logger.info("else");
-			response = Response.status(Status.NO_CONTENT).entity(null).build();
+			response = Response.status(Status.NO_CONTENT).entity(msg).build();
 		}
 		return response;
 	}

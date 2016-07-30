@@ -30,6 +30,11 @@ public interface CustomerService {
 	@Path("/getCustomerByID/{id}")
 	public Response getCustomerByID(@PathParam("id") Integer id);
 	
+	/*@GET
+	@Produces({ MediaType.APPLICATION_JSON})
+	@Path("/getCustomerByID/{id}")
+	public Response getCustomerByID(@PathParam("id") Integer id);*/
+	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON/*, MediaType.TEXT_PLAIN, MediaType.APPLICATION_XML */})
 	@Path("/getCustomers")
@@ -48,7 +53,7 @@ public interface CustomerService {
 	public Response updateCustomer(final Customer customer);
 	
 	@DELETE
-	@Produces({ MediaType.TEXT_PLAIN})
+	@Produces(MediaType.APPLICATION_JSON)
 	@Path("/deleteCustomerByID/{id}")
 	public Response deleteCustomerByID(@PathParam("id") Integer id);
 	

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.jaxrs.cxf.rest.bo.Customer;
@@ -12,6 +15,8 @@ import com.jaxrs.cxf.rest.bo.NewCustomer;
 
 @Component("transactionBo")
 public class TransactionBoImpl implements TransactionBo {
+	
+	private static final Logger logger = LoggerFactory.getLogger(TransactionBoImpl.class);
 
 	public Customer getCustomerByID(Integer id) {
 		return CustomerFactory.getCustomerByID(id);
@@ -25,16 +30,17 @@ public class TransactionBoImpl implements TransactionBo {
 	@Override
 	public String createCustomer(List<NewCustomer> newCustomers) {
 		String responseStr = null;
-		int size = CustomerFactory.getCustomers().size();
-		Map<Integer, Customer> customersMap = new HashMap<>();
+		int sizeBeforeCreateNewCustomer = CustomerFactory.getCustomers().size();
 		for (NewCustomer newCustomer : newCustomers) {
+			logger.info(newCustomer.toString());
+			int size = CustomerFactory.getCustomers().size();
+			logger.info("CustomerFactory.getCustomers().size()" + size);
 			Integer id = size + 1;
-			customersMap.put(id, CustomerFactory.newCustomer(id, newCustomer.getName(), newCustomer.getLocation()));
+			CustomerFactory.getCustomers().put(id, CustomerFactory.newCustomer(id, newCustomer.getName(), newCustomer.getLocation()));
 		}
-		CustomerFactory.getCustomers().putAll(customersMap);
-		if (newCustomers.size() + size == CustomerFactory.getCustomers().size()) {
+		if (newCustomers.size() + sizeBeforeCreateNewCustomer == CustomerFactory.getCustomers().size()) {
 			responseStr = "All new customers are successfully created.";
-		} else if (newCustomers.size() + size > CustomerFactory.getCustomers().size()) {
+		} else if (newCustomers.size() + sizeBeforeCreateNewCustomer > CustomerFactory.getCustomers().size()) {
 			responseStr = "NOT all new customers are successfully created.";
 		} else {
 			responseStr = "new customers creation was NOT successful.";
@@ -66,6 +72,8 @@ public class TransactionBoImpl implements TransactionBo {
 		boolean deleteCustomerByID = CustomerFactory.deleteCustomerByID(id);
 		if(deleteCustomerByID){
 			msg = "Customer has been deleted successfully.";
+		}else{
+			msg = "Customer NOT FOUND.";
 		}
 		return msg;
 	}
