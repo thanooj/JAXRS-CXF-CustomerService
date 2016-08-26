@@ -2,19 +2,25 @@ package com.jaxrs.cxf.rest.bo;
 
 import org.springframework.stereotype.Component;
 
-@Component("newCustomer")
-public class NewCustomer {
+@Component("employee")
+public class Employee {
 
+	private Integer id;
 	private String name;
 	private String location;
 
-	public NewCustomer() {
+	public Employee() {
 	}
 
-	public NewCustomer(String name, String location) {
+	public Employee(Integer id, String name, String location) {
+		this.id = id;
 		this.name = name;
 		this.location = location;
 
+	}
+	
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -33,9 +39,13 @@ public class NewCustomer {
 		this.location = location;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
 	@Override
 	public String toString() {
-		return "Customer [name=" + name + ", location=" + location + "]";
+		return "Customer [id=" + id + ", name=" + name + ", location=" + location + "]";
 	}
 
 }

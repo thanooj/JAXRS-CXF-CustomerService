@@ -2,16 +2,16 @@ package com.jaxrs.cxf.rest.bo;
 
 import org.springframework.stereotype.Component;
 
-@Component("newCustomer")
-public class NewCustomer {
+@Component("newEmployee")
+public class NewEmployee {
 
 	private String name;
 	private String location;
 
-	public NewCustomer() {
+	public NewEmployee() {
 	}
 
-	public NewCustomer(String name, String location) {
+	public NewEmployee(String name, String location) {
 		this.name = name;
 		this.location = location;
 
